@@ -38,6 +38,10 @@ async function main() {
 
   console.log(loyaltyCoin);
 
+  //way to get a specific coin contract object
+  const sbucksCoin = await hre.ethers.getContractAt("LoyaltyERC20", loyaltyCoin);
+  console.log(await sbucksCoin.owner());
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
