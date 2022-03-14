@@ -25,8 +25,8 @@ async function main() {
 
   await factory.createLoyaltyERC20Coin("MOES Coin", "MOES", 1000000);
   await factory.createLoyaltyERC20Coin("Starbucks Coin", "SBUCKS", 1000000);
-  await factory.createLoyaltyERC20Coin("MOES Coin", "LOYL", 1000000);
-  await factory.createLoyaltyERC20Coin("Starbucks Coin", "MCD", 1000000);
+  await factory.createLoyaltyERC20Coin("LOYL Coin", "LOYL", 1000000);
+  await factory.createLoyaltyERC20Coin("McDonalds Coin", "MCD", 1000000);
 
   console.log("Total coins:", (await factory.totalCoins()).toNumber());
 
