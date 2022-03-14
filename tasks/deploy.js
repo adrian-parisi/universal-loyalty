@@ -42,6 +42,18 @@ async function main() {
   const sbucksCoin = await hre.ethers.getContractAt("LoyaltyERC20", loyaltyCoin);
   console.log(await sbucksCoin.owner());
 
+  // few tests for mint() and burn()
+  const [owner] = await ethers.getSigners();
+  console.log("initial totalsupply(): ", (await sbucksCoin.totalSupply()));
+  let txn = await sbucksCoin.mint(owner.address, 10000);
+  txn.wait();
+  console.log("after mint updated totalsupply(): ", (await sbucksCoin.totalSupply()));
+
+  txn = await sbucksCoin.burn(owner.address, 10000);
+  txn.wait();
+  console.log("after burn updated totalsupply(): ", (await sbucksCoin.totalSupply()));
+
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
