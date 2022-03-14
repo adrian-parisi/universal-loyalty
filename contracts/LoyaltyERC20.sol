@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "hardhat/console.sol";
 
-contract LoyaltyERC20 is ERC20, ERC20Burnable {
+contract LoyaltyERC20 is ERC20 {
     address public owner;
     //add admin users later
 
@@ -17,10 +17,14 @@ contract LoyaltyERC20 is ERC20, ERC20Burnable {
         owner = _owner;
     }
 
-    function mint(address to, uint256 amount) public {
-        _mint(to, amount);
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount * 10 ** 18);
     }
-    
+
+    function burn(address from, uint256 amount) external {
+        _burn(from, amount * 10 ** 18);
+    }
+
     modifier onlyOwner {
         require(msg.sender == owner, "not the owner");
         _;
