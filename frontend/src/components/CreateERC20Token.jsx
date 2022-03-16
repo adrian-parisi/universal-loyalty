@@ -1,0 +1,161 @@
+import { useWeb3React } from '@web3-react/core';
+import { ethers } from 'ethers';
+import {
+  useEffect,
+  useState
+} from 'react';
+import LoyaltyCoinFactory from '../artifacts/contracts/LoyaltyCoinFactory.sol/LoyaltyCoinFactory.json';
+import styled from 'styled-components';
+
+// TODO Need to figure out how to use env variables in ReactJS.
+// Workaround: Deploy factory and paste contract address here.
+const REACT_APP_LOYALTY_TOKEN_FACTORY_ADDRESS = "<DEFINE CONTRACT HERE!>";
+
+const StyledDeployContractButton = styled.button`
+  width: 180px;
+  height: 2rem;
+  border-radius: 1rem;
+  border-color: blue;
+  cursor: pointer;
+  place-self: center;
+`;
+
+const StyledGreetingDiv = styled.div`
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 135px 2.7fr 1fr;
+  grid-gap: 10px;
+  place-self: center;
+  align-items: center;
+`;
+
+const StyledLabel = styled.label`
+  font-weight: bold;
+`;
+
+const StyledInput = styled.input`
+  width: 250px;
+  padding: 0.4rem 0.6rem;
+  line-height: 2fr;
+`;
+
+const StyledButton = styled.button`
+  width: 150px;
+  height: 2rem;
+  border-radius: 1rem;
+  border-color: blue;
+  cursor: pointer;
+`;
+
+export function CreateERC20Token() {
+  const context = useWeb3React();
+  const { library, active } = context;
+
+  const [signer, setSigner] = useState();
+  const [brandName, setBrandName] = useState('');
+  const [tokenName, setTokenName] = useState('');
+  const [tokenSymbol, setTokenSymbol] = useState('');
+  const [decimalPoints, setDecimalPoints] = useState('');
+  const [initialSupply, setInitialSupply] = useState('');
+
+  useEffect(() => {
+    if (!library) {
+      setSigner(undefined);
+      return;
+    }
+
+    setSigner(library.getSigner());
+  }, [library]);
+
+  function handleCreateToken(event) {
+    event.preventDefault();
+
+    async function deployLoyaltyERC20Contract(signer) {
+      try {
+        console.log("Getting Loyalty Token Factory at ", REACT_APP_LOYALTY_TOKEN_FACTORY_ADDRESS);
+        const loyaltyTokenFactory = new ethers.Contract(REACT_APP_LOYALTY_TOKEN_FACTORY_ADDRESS, LoyaltyCoinFactory.abi, signer);
+        console.log("Creating new loyalty token: ", tokenSymbol);
+        const tx = await loyaltyTokenFactory.createLoyaltyERC20Coin(tokenName, tokenSymbol, initialSupply);
+        const receipt = await tx.wait();
+        const creationEvent = receipt.events.find(x => x.event === "CoinCreated");
+        console.log(`Token ${tokenName} has been created with a total supply of ${initialSupply}`);
+      } catch (error) {
+        window.alert(
+          'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+        );
+      }
+    }
+    deployLoyaltyERC20Contract(signer);
+  }
+
+  function handleBrandNameChange(event) {
+    event.preventDefault();
+    setBrandName(event.target.value);
+  }
+
+  function handleTokenNameChange(event) {
+    event.preventDefault();
+    setTokenName(event.target.value);
+  }
+
+  function handleTokenSymbolChange(event) {
+    event.preventDefault();
+    setTokenSymbol(event.target.value);
+  }
+
+  function handleDecimalPointsChange(event) {
+    event.preventDefault();
+    setDecimalPoints(event.target.value);
+  }
+
+  function handleInitialSupplyChange(event) {
+    event.preventDefault();
+    setInitialSupply(event.target.value);
+  }
+
+  return (
+    <>
+      <StyledInput
+        id="brandNameInput"
+        type="text"
+        placeholder={brandName ? '' : 'Brand Name'}
+        onChange={handleBrandNameChange}
+      ></StyledInput>
+
+      <StyledInput
+        id="tokenNameInput"
+        type="text"
+        placeholder={tokenName ? '' : 'Token Name'}
+        onChange={handleTokenNameChange}
+      ></StyledInput>
+
+      <StyledInput
+        id="tokenSymbolInput"
+        type="text"
+        placeholder={tokenSymbol ? '' : 'Token Symbol'}
+        onChange={handleTokenSymbolChange}
+      ></StyledInput>
+
+      <StyledInput
+        id="decimalPointsInput"
+        type="text"
+        placeholder={decimalPoints ? '' : 'Decimal Points'}
+        onChange={handleDecimalPointsChange}
+      ></StyledInput>
+
+      <StyledInput
+        id="initialSupplyInput"
+        type="text"
+        placeholder={initialSupply ? '' : 'Initial Supply'}
+        onChange={handleInitialSupplyChange}
+      ></StyledInput>
+
+      <StyledButton
+        id="createTokenButton"
+        onClick={handleCreateToken}
+      >
+        Create Token
+      </StyledButton>
+    </>
+  );
+}

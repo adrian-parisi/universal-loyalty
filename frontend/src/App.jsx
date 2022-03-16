@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import { ActivateDeactivate } from './components/ActivateDeactivate';
-import { Greeter } from './components/Greeter';
 import { SectionDivider } from './components/SectionDivider';
 import { SignMessage } from './components/SignMessage';
+import { CreateERC20Token } from './components/CreateERC20Token';
 import { WalletStatus } from './components/WalletStatus';
 
 const StyledAppDiv = styled.div`
@@ -19,7 +19,7 @@ export function App() {
       <SectionDivider />
       <SignMessage />
       <SectionDivider />
-      <Greeter />
+      <CreateERC20Token />
     </StyledAppDiv>
   );
 }
