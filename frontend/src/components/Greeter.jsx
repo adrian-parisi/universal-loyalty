@@ -6,7 +6,7 @@ import {
 } from 'react';
 import styled from 'styled-components';
 import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
-import { SectionDivider } from './SectionDivider';
+import { SectionDivider } from './shared/SectionDivider';
 
 const StyledDeployContractButton = styled.button`
   width: 180px;

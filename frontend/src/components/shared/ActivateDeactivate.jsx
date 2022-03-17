@@ -6,8 +6,8 @@ import {
 } from '@web3-react/injected-connector';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { injected } from '../utils/connectors';
-import { useEagerConnect, useInactiveListener } from '../utils/hooks';
+import { injected } from '../../utils/connectors';
+import { useEagerConnect, useInactiveListener } from '../../utils/hooks';
 
 
 function getErrorMessage(error) {

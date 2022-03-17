@@ -102,10 +102,10 @@ function Account() {
         {typeof account === 'undefined'
           ? ''
           : account
-          ? `${account.substring(0, 6)}...${account.substring(
+            ? `${account.substring(0, 6)}...${account.substring(
               account.length - 4
             )}`
-          : ''}
+            : ''}
       </span>
     </>
   );
@@ -173,8 +173,8 @@ function Balance() {
         {balance === null
           ? 'Error'
           : balance
-          ? `Ξ${Math.round(+ethers.utils.formatEther(balance) * 1e4) / 1e4}`
-          : ''}
+            ? `Ξ${Math.round(+ethers.utils.formatEther(balance) * 1e4) / 1e4}`
+            : ''}
       </span>
     </>
   );
