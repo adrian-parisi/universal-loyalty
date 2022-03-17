@@ -3,7 +3,9 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
+const { ethers } = require("hardhat");
 const hre = require("hardhat");
+
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -18,15 +20,15 @@ async function main() {
   //const loyalty = await LoyaltyERCToken.deploy("Loyalty Coin", "LOYL", 1000000);
 
   const LoyaltyCoinFactory = await hre.ethers.getContractFactory("LoyaltyCoinFactory");
-  const factory = await LoyaltyCoinFactory.deploy();
+  let factory = await LoyaltyCoinFactory.deploy();
   await factory.deployed();
 
   console.log("LoyaltyCoinFactory deployed to:", factory.address);
 
-  await factory.createLoyaltyERC20Coin("MOES Coin", "MOES", 1000000);
-  await factory.createLoyaltyERC20Coin("Starbucks Coin", "SBUCKS", 1000000);
-  await factory.createLoyaltyERC20Coin("LOYL Coin", "LOYL", 1000000);
-  await factory.createLoyaltyERC20Coin("McDonalds Coin", "MCD", 1000000);
+  await factory.createLoyaltyERC20Coin("MOES Coin", "MOES", ethers.utils.parseUnits("1000000", 18));
+  await factory.createLoyaltyERC20Coin("Starbucks Coin", "SBUCKS", ethers.utils.parseUnits("1000000", 18));
+  await factory.createLoyaltyERC20Coin("LOYL Coin", "LOYL", ethers.utils.parseUnits("1000000", 18));
+  await factory.createLoyaltyERC20Coin("McDonalds Coin", "MCD", ethers.utils.parseUnits("1000000", 18));
 
   console.log("Total coins:", (await factory.totalCoins()).toNumber());
 
@@ -39,20 +41,41 @@ async function main() {
   console.log(loyaltyCoin);
 
   //way to get a specific coin contract object
-  const sbucksCoin = await hre.ethers.getContractAt("LoyaltyERC20", loyaltyCoin);
-  console.log(await sbucksCoin.owner());
-
+  let sbucksCoin = await hre.ethers.getContractAt("LoyaltyERC20", loyaltyCoin);
   // few tests for mint() and burn()
-  const [owner] = await ethers.getSigners();
+  const [owner, user] = await ethers.getSigners();
+
+  console.log("owner address: ", await sbucksCoin.owner());
+  console.log("owner balance: ", await sbucksCoin.balanceOf(await sbucksCoin.owner()));
+  console.log("user address: ", user.address);
+  console.log("user balance: ", await sbucksCoin.balanceOf(user.address));
+
+
+
   console.log("initial totalsupply(): ", (await sbucksCoin.totalSupply()));
-  let txn = await sbucksCoin.mint(owner.address, 10000);
+  let nonce = await owner.getTransactionCount();
+  console.log("nonce1: ", nonce);
+  let txn = await sbucksCoin.mint(user.address, ethers.utils.parseUnits("100", 18), {nonce:nonce});
   txn.wait();
   console.log("after mint updated totalsupply(): ", (await sbucksCoin.totalSupply()));
+  console.log("owner balance after mint: ", await sbucksCoin.balanceOf(owner.address));
+  console.log("user balance after mint: ", await sbucksCoin.balanceOf(user.address));
 
-  txn = await sbucksCoin.burn(owner.address, 10000);
+  nonce = await owner.getTransactionCount();
+  console.log("nonce2: ", nonce);
+  txn = await sbucksCoin.burn(owner.address, ethers.utils.parseUnits("10", 18), {nonce:nonce});
   txn.wait();
   console.log("after burn updated totalsupply(): ", (await sbucksCoin.totalSupply()));
+  console.log("owner balance after burn: ", await sbucksCoin.balanceOf(owner.address));
+  console.log("user balance after burn: ", await sbucksCoin.balanceOf(user.address));
 
+  factory = await factory.connect(user);
+  sbucksCoin = await sbucksCoin.connect(user);
+  await sbucksCoin.approve(factory.address, ethers.utils.parseUnits("5", 18));
+  txn = await factory.redeemCoins("SBUCKS", ethers.utils.parseUnits("5", 18));
+  console.log("after redeem updated totalsupply(): ", (await sbucksCoin.totalSupply()));
+  console.log("owner balance after redeem: ", await sbucksCoin.balanceOf(owner.address));
+  console.log("user balance after redeem: ", await sbucksCoin.balanceOf(user.address));
 
 }
 
