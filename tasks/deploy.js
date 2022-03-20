@@ -18,27 +18,29 @@ async function main() {
   // We get the contract to deploy
   //const LoyaltyERCToken = await hre.ethers.getContractFactory("LoyaltyERC20");
   //const loyalty = await LoyaltyERCToken.deploy("Loyalty Coin", "LOYL", 1000000);
-
   const LoyaltyCoinFactory = await hre.ethers.getContractFactory("LoyaltyCoinFactory");
   let factory = await LoyaltyCoinFactory.deploy();
   await factory.deployed();
 
   console.log("LoyaltyCoinFactory deployed to:", factory.address);
 
+  //deploy loyalty program manager
+  const LoyaltyProgamMgr = await hre.ethers.getContractFactory("LoyaltyProgramManager");
+  let manager = await LoyaltyProgamMgr.deploy(factory.address);
+  await manager.deployed();
+
+  console.log("LoyaltyProgramManager deployed to:", manager.address);
+
   await factory.createLoyaltyERC20Coin("MOES Coin", "MOES", ethers.utils.parseUnits("1000000", 18));
   await factory.createLoyaltyERC20Coin("Starbucks Coin", "SBUCKS", ethers.utils.parseUnits("1000000", 18));
   await factory.createLoyaltyERC20Coin("LOYL Coin", "LOYL", ethers.utils.parseUnits("1000000", 18));
   await factory.createLoyaltyERC20Coin("McDonalds Coin", "MCD", ethers.utils.parseUnits("1000000", 18));
 
-  console.log("Total coins:", (await factory.totalCoins()).toNumber());
-
-  let loyaltyCoin = await factory.getCoinAddressBySymbol("LOYL");
-
-  console.log(loyaltyCoin);
+  console.log("Total coins created:", (await factory.totalCoins()).toNumber());
 
   loyaltyCoin = await factory.getCoinAddressBySymbol("SBUCKS");
 
-  console.log(loyaltyCoin);
+  console.log("SBUCKS Contract Address: ", loyaltyCoin);
 
   //way to get a specific coin contract object
   let sbucksCoin = await hre.ethers.getContractAt("LoyaltyERC20", loyaltyCoin);
@@ -46,37 +48,56 @@ async function main() {
   const [owner, user] = await ethers.getSigners();
 
   console.log("owner address: ", await sbucksCoin.owner());
-  console.log("owner balance: ", await sbucksCoin.balanceOf(await sbucksCoin.owner()));
   console.log("user address: ", user.address);
-  console.log("user balance: ", await sbucksCoin.balanceOf(user.address));
+  printLog(await sbucksCoin.totalSupply(), 
+          await sbucksCoin.balanceOf(owner.address), 
+          await sbucksCoin.balanceOf(user.address), 
+          "INITIAL STAGE");
 
-
-
-  console.log("initial totalsupply(): ", (await sbucksCoin.totalSupply()));
   let nonce = await owner.getTransactionCount();
-  console.log("nonce1: ", nonce);
+  //console.log("nonce1: ", nonce);
+
+  //mint (by owner)
   let txn = await sbucksCoin.mint(user.address, ethers.utils.parseUnits("100", 18), {nonce:nonce});
   txn.wait();
-  console.log("after mint updated totalsupply(): ", (await sbucksCoin.totalSupply()));
-  console.log("owner balance after mint: ", await sbucksCoin.balanceOf(owner.address));
-  console.log("user balance after mint: ", await sbucksCoin.balanceOf(user.address));
+  printLog(await sbucksCoin.totalSupply(), 
+          await sbucksCoin.balanceOf(owner.address), 
+          await sbucksCoin.balanceOf(user.address), 
+          "AFTER MINT");
 
+  // burn (by owner)
   nonce = await owner.getTransactionCount();
-  console.log("nonce2: ", nonce);
   txn = await sbucksCoin.burn(owner.address, ethers.utils.parseUnits("10", 18), {nonce:nonce});
   txn.wait();
-  console.log("after burn updated totalsupply(): ", (await sbucksCoin.totalSupply()));
-  console.log("owner balance after burn: ", await sbucksCoin.balanceOf(owner.address));
-  console.log("user balance after burn: ", await sbucksCoin.balanceOf(user.address));
+  printLog(await sbucksCoin.totalSupply(), 
+          await sbucksCoin.balanceOf(owner.address), 
+          await sbucksCoin.balanceOf(user.address), 
+          "AFTER BURN");
 
+  // redeem (by user)
   factory = await factory.connect(user);
   sbucksCoin = await sbucksCoin.connect(user);
+  // let success = await sbucksCoin.approve(manager.address, ethers.utils.parseUnits("50", 18));
+  // console.log("approve worked? ", success);
+  // txn = await manager.redeemCoins("SBUCKS", ethers.utils.parseUnits("50", 18));
+
   await sbucksCoin.approve(factory.address, ethers.utils.parseUnits("5", 18));
   txn = await factory.redeemCoins("SBUCKS", ethers.utils.parseUnits("5", 18));
-  console.log("after redeem updated totalsupply(): ", (await sbucksCoin.totalSupply()));
-  console.log("owner balance after redeem: ", await sbucksCoin.balanceOf(owner.address));
-  console.log("user balance after redeem: ", await sbucksCoin.balanceOf(user.address));
+  printLog(await sbucksCoin.totalSupply(), 
+          await sbucksCoin.balanceOf(owner.address), 
+          await sbucksCoin.balanceOf(user.address), 
+          "AFTER REDEEM");
 
+}
+
+// debug log function
+function printLog(totalSupply, ownerBalance, userBalance, stage) {
+  console.log("-----------------------------------------");
+  console.log("Stage: ", stage);
+  console.log("      USER Balance: ", userBalance);
+  console.log("      OWNER Balance: ", ownerBalance);
+  console.log("      TOTALSUPPLY: ", totalSupply);
+  console.log("-----------------------------------------");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
