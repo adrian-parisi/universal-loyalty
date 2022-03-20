@@ -13,7 +13,7 @@ contract LoyaltyCoinFactory {
     address owner;
     mapping(string => address) public loyaltyCoins;
     uint256 public totalCoins;
-    event CoinCreated(address indexed _creator, string indexed _tokenSymbol, uint _totalSupply);
+    event CoinCreated(address indexed _creator, address indexed _coinAddress, string indexed _tokenSymbol, uint _totalSupply);
     event CoinsRedeemed(address indexed _user, string indexed _tokenSymbol);
 
     constructor() {
@@ -25,7 +25,7 @@ contract LoyaltyCoinFactory {
     function createLoyaltyERC20Coin(string memory  _tokenName, string memory _tokenSymbol, uint256 _totalSupply) public onlyOwnerAndAdmin {
         loyaltyCoins[_tokenSymbol] = address(new LoyaltyERC20(_tokenName, _tokenSymbol, _totalSupply, msg.sender));
         totalCoins++;
-        emit CoinCreated(msg.sender, _tokenSymbol, _totalSupply);
+        emit CoinCreated(msg.sender, loyaltyCoins[_tokenSymbol] , _tokenSymbol, _totalSupply);
      }
 
     //
