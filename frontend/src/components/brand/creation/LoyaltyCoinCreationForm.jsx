@@ -51,7 +51,6 @@ export function LoyaltyCoinCreationForm() {
   const [brandName, setBrandName] = useState('');
   const [tokenName, setTokenName] = useState('');
   const [tokenSymbol, setTokenSymbol] = useState('');
-  const [decimalPoints, setDecimalPoints] = useState('');
   const [initialSupply, setInitialSupply] = useState('');
 
   let navigate = useNavigate();
@@ -105,11 +104,6 @@ export function LoyaltyCoinCreationForm() {
     setTokenSymbol(event.target.value);
   }
 
-  function handleDecimalPointsChange(event) {
-    event.preventDefault();
-    setDecimalPoints(event.target.value);
-  }
-
   function handleInitialSupplyChange(event) {
     event.preventDefault();
     setInitialSupply(event.target.value);
@@ -136,13 +130,6 @@ export function LoyaltyCoinCreationForm() {
         type="text"
         placeholder={tokenSymbol ? '' : 'Token Symbol'}
         onChange={handleTokenSymbolChange}
-      ></StyledInput>
-
-      <StyledInput
-        id="decimalPointsInput"
-        type="text"
-        placeholder={decimalPoints ? '' : 'Decimal Points'}
-        onChange={handleDecimalPointsChange}
       ></StyledInput>
 
       <StyledInput
