@@ -1,7 +1,7 @@
 import { ActivateDeactivate } from '../../shared/ActivateDeactivate';
 import { SectionDivider } from '../../shared/SectionDivider';
 import { WalletStatus } from '../../shared/WalletStatus';
-import React, { useState } from 'react';
+import { useSelector } from 'react-redux'
 import styled from 'styled-components';
 
 const StyledLabel = styled.label`
@@ -10,8 +10,9 @@ const StyledLabel = styled.label`
 
 
 function RemainingTokens(props) {
+  const tokenName = useSelector((state) => state.token.tokenName)
   return (
-    <StyledLabel>REMAINING TOKENS: {props.remainingTokens} {props.tokenName}</StyledLabel>
+    <StyledLabel>REMAINING TOKENS: 100 {tokenName}</StyledLabel>
   );
 }
 
@@ -24,10 +25,7 @@ export function LoyaltyCoinDistributionPage(props) {
       <SectionDivider />
       <WalletStatus />
       <SectionDivider />
-      <RemainingTokens
-        remainingTokens={props.initialSupply}
-        tokenName={props.tokenName}
-      />
+      <RemainingTokens />
     </>
   );
 }

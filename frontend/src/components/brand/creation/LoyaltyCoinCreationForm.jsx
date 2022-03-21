@@ -4,6 +4,8 @@ import {
   useEffect,
   useState
 } from 'react';
+import { useDispatch } from 'react-redux'
+import { storeTokenName } from '../../../features/token/tokenSlice'
 import LoyaltyCoinFactory from '../../../artifacts/contracts/LoyaltyCoinFactory.sol/LoyaltyCoinFactory.json';
 import styled from 'styled-components';
 import { useNavigate } from "react-router-dom";
@@ -18,15 +20,6 @@ const StyledDeployContractButton = styled.button`
   border-radius: 1rem;
   border-color: blue;
   cursor: pointer;
-`;
-
-const StyledGreetingDiv = styled.div`
-  display: grid;
-  grid-template-rows: 1fr 1fr 1fr;
-  grid-template-columns: 135px 2.7fr 1fr;
-  grid-gap: 10px;
-  place-self: center;
-  align-items: center;
 `;
 
 const StyledInput = styled.input`
@@ -45,7 +38,8 @@ const StyledButton = styled.button`
 
 export function LoyaltyCoinCreationForm() {
   const context = useWeb3React();
-  const { library, active } = context;
+  const { library } = context;
+  const dispatch = useDispatch()
 
   const [signer, setSigner] = useState();
   const [brandName, setBrandName] = useState('');
@@ -76,6 +70,7 @@ export function LoyaltyCoinCreationForm() {
         const receipt = await tx.wait();
         const creationEvent = receipt.events.find(x => x.event === "CoinCreated");
         console.log(`Token ${tokenName} has been created with a total supply of ${initialSupply}`);
+        dispatch(storeTokenName(tokenName));
         navigate("/distribution", {
           tokenName: tokenName,
           tokenSymbol: tokenSymbol
