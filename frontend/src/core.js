@@ -13,6 +13,7 @@ class LoyaltyCoinHelper {
       LoyaltyProgramManager.abi,
       owner
     );
+
     this.factory = new ethers.Contract(
       process.env.REACT_APP_LOYALTY_TOKEN_FACTORY_ADDRESS,
       LoyaltyCoinFactory.abi,

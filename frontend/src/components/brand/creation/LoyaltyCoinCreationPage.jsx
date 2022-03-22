@@ -1,8 +1,7 @@
-import { ActivateDeactivate } from '../../shared/ActivateDeactivate';
-import { LoyaltyCoinCreationForm } from './LoyaltyCoinCreationForm';
-import { SectionDivider } from '../../shared/StyledComponents';
-import { SignMessage } from '../../shared/SignMessage';
-import { WalletStatus } from '../../shared/WalletStatus';
+import { ActivateDeactivate } from 'components/shared/ActivateDeactivate';
+import { LoyaltyCoinCreationSection } from 'components/brand/creation/LoyaltyCoinCreationSection';
+import { SectionDivider } from 'components/shared/StyledComponents';
+import { WalletStatus } from 'components/shared/WalletStatus';
 
 export function LoyaltyCoinCreationPage() {
   return (
@@ -11,9 +10,7 @@ export function LoyaltyCoinCreationPage() {
       <SectionDivider />
       <WalletStatus />
       <SectionDivider />
-      <SignMessage />
-      <SectionDivider />
-      <LoyaltyCoinCreationForm />
+      <LoyaltyCoinCreationSection />
     </>
   );
 }

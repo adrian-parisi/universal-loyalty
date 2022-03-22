@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Routes, Route } from "react-router-dom";
 import { LoyaltyCoinCreationPage } from './components/brand/creation/LoyaltyCoinCreationPage';
 import { LoyaltyCoinDistributionPage } from './components/brand/distribution/LoyaltyCoinDistributionPage';
+import { LoyaltyCoinRedeemingPage } from './components/brand/redeem/LoyaltyCoinRedeemingPage';
 
 const StyledAppDiv = styled.div`
   display: grid;
@@ -15,6 +16,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<LoyaltyCoinCreationPage />} />
         <Route path="/distribution" element={<LoyaltyCoinDistributionPage />} />
+        <Route path="/redeem" element={<LoyaltyCoinRedeemingPage />} />
       </Routes>
     </StyledAppDiv>
   );
