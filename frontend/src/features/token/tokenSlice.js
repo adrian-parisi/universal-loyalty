@@ -4,20 +4,19 @@ export const tokenSlice = createSlice({
   name: 'token',
   initialState: {
     tokenName: "",
+    tokenSymbol: "",
     remainingTokens: 0,
   },
   reducers: {
-    storeTokenName: (state, action) => {
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes
-      state.tokenName = action.payload;
+    storeToken: (state, action) => {
+      state.tokenName = action.payload.name;
+      state.tokenSymbol = action.payload.symbol;
+      state.remainingTokens = action.payload.remainingTokens;
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { storeTokenName } = tokenSlice.actions
+export const { storeToken } = tokenSlice.actions
 
 export default tokenSlice.reducer
