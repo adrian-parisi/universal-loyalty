@@ -1,14 +1,12 @@
 import { useWeb3React } from '@web3-react/core';
-import { ethers } from 'ethers';
 import {
   useEffect,
   useState
 } from 'react';
-import { StyledInput, StyledButton } from '../../shared/StyledComponents';
 import { useDispatch } from 'react-redux'
-import tokenSlice, { storeToken } from '../../../features/token/tokenSlice'
-import LoyaltyCoinFactory from '../../../artifacts/contracts/LoyaltyCoinFactory.sol/LoyaltyCoinFactory.json';
-import LoyaltyCoinHelper from '../../../core'
+import { storeToken } from '../../../features/token/tokenSlice'
+import LoyaltyCoinHelper from 'core'
+import { Grid, TextField, Container, Typography, Button } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 
 
@@ -38,6 +36,7 @@ export function LoyaltyCoinCreationSection(props) {
     event.preventDefault();
 
     async function deployLoyaltyERC20Contract(signer) {
+      console.log(tokenName);
       const token = {
         name: tokenName,
         symbol: tokenSymbol,
@@ -79,41 +78,61 @@ export function LoyaltyCoinCreationSection(props) {
   }
 
   return (
-    <>
-      <StyledInput
-        id="brandNameInput"
-        type="text"
-        placeholder={brandName ? '' : 'Brand Name'}
-        onChange={handleBrandNameChange}
-      ></StyledInput>
-
-      <StyledInput
-        id="tokenNameInput"
-        type="text"
-        placeholder={tokenName ? '' : 'Token Name'}
-        onChange={handleTokenNameChange}
-      ></StyledInput>
-
-      <StyledInput
-        id="tokenSymbolInput"
-        type="text"
-        placeholder={tokenSymbol ? '' : 'Token Symbol'}
-        onChange={handleTokenSymbolChange}
-      ></StyledInput>
-
-      <StyledInput
-        id="initialSupplyInput"
-        type="text"
-        placeholder={initialSupply ? '' : 'Initial Supply'}
-        onChange={handleInitialSupplyChange}
-      ></StyledInput>
-
-      <StyledButton
-        id="createTokenButton"
-        onClick={handleCreateToken}
-      >
-        Create Token
-      </StyledButton>
-    </>
+    <Container>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="h5">
+            Loyalty Token Creation
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            id="brandNameInput"
+            label={brandName ? '' : 'Brand Name'}
+            onChange={handleBrandNameChange}
+            style={{ width: 500 }}
+          ></TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            id="tokenNameInput"
+            label={tokenName ? '' : 'Token Name'}
+            onChange={handleTokenNameChange}
+            style={{ width: 500 }}
+          ></TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            id="tokenSymbolInput"
+            label={tokenSymbol ? '' : 'Token Symbol'}
+            onChange={handleTokenSymbolChange}
+            style={{ width: 500 }}
+          ></TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            id="initialSupplyInput"
+            type="text"
+            label={initialSupply ? '' : 'Initial Supply'}
+            onChange={handleInitialSupplyChange}
+            style={{ width: 500 }}
+          ></TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="outlined"
+            id="createTokenButton"
+            onClick={handleCreateToken}
+            size="large"
+          >
+            Create Token
+          </Button>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }

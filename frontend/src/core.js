@@ -6,18 +6,18 @@ import LoyaltyProgramManager from './artifacts/contracts/LoyaltyProgramManager.s
 
 class LoyaltyCoinHelper {
 
-  constructor(owner) {
-    this.owner = owner;
+  constructor(signer) {
+    this.signer = signer;
     this.manager = new ethers.Contract(
       process.env.REACT_APP_LOYALTY_PROGRAM_MANAGER_ADDRESS,
       LoyaltyProgramManager.abi,
-      owner
+      signer
     );
 
     this.factory = new ethers.Contract(
       process.env.REACT_APP_LOYALTY_TOKEN_FACTORY_ADDRESS,
       LoyaltyCoinFactory.abi,
-      owner
+      signer
     );
   }
 
@@ -29,7 +29,6 @@ class LoyaltyCoinHelper {
     const tx = await this.factory.createLoyaltyERC20Coin(token.name, token.symbol, ethers.utils.parseEther(token.initialSupply));
     const receipt = await tx.wait();
     const creationEvent = receipt.events.find(x => x.event === "CoinCreated");
-    window.creationEvent = creationEvent;
     const tokenAddress = '0x' + creationEvent.topics[2].slice(-40);
     console.log(`Token ${token.name} has been created\n` +
       `Address: ${tokenAddress}\n` +
@@ -39,12 +38,25 @@ class LoyaltyCoinHelper {
   async earnCoins(tokenSymbol, address, amount) {
     const coinAddress = await this.factory.getCoinAddressBySymbol(tokenSymbol);
     console.log(`${tokenSymbol} address: ${coinAddress}`);
-    const coin = new ethers.Contract(coinAddress, LoyaltyERC20.abi, this.owner);
-    await coin.approve(this.manager.address, ethers.BigNumber.from(amount));
+    const coin = new ethers.Contract(coinAddress, LoyaltyERC20.abi, this.signer);
+    const amountWithDecimals = ethers.utils.parseEther(amount);
+    await coin.approve(this.manager.address, ethers.BigNumber.from(amountWithDecimals));
     console.log(`Contract's been allowed to transfer ${amount} ${tokenSymbol}`);
-    const tx = await this.manager.earnCoins(address, tokenSymbol, ethers.BigNumber.from(amount));
+    const tx = await this.manager.earnCoins(address, tokenSymbol, ethers.BigNumber.from(amountWithDecimals));
     await tx.wait();
     console.log(`Token ${tokenSymbol} has been distributed successfully to ${address}`);
+  }
+
+  async redeemCoins(tokenSymbol, amount) {
+    console.log(`Redeeming coins: ${amount} ${tokenSymbol}`);
+    const coinAddress = await this.factory.getCoinAddressBySymbol(tokenSymbol);
+    console.log(`${tokenSymbol} address: ${coinAddress}`);
+    const coin = new ethers.Contract(coinAddress, LoyaltyERC20.abi, this.signer);
+    const amountWithDecimals = ethers.utils.parseEther(amount);
+    await coin.approve(this.manager.address, ethers.BigNumber.from(amountWithDecimals));
+    const tx = await this.manager.redeemCoins(tokenSymbol, ethers.BigNumber.from(amountWithDecimals));
+    await tx.wait();
+    console.log(`Successfully redeemed ${amount} ${tokenSymbol}`);
   }
 
 }

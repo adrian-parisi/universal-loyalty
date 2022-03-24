@@ -1,12 +1,10 @@
 import { useWeb3React } from '@web3-react/core';
-import { ethers } from 'ethers';
 import { ActivateDeactivate } from '../../shared/ActivateDeactivate';
-import { SectionDivider, StyledInput, StyledButton } from '../../shared/StyledComponents';
-import { WalletStatus } from '../../shared/WalletStatus';
 import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import LoyaltyCoinHelper from '../../../core'
+import { Divider, Grid, TextField, Container, Typography, Button } from '@mui/material';
+import LoyaltyCoinHelper from 'core'
 
 
 const StyledLabel = styled.label`
@@ -16,9 +14,11 @@ const StyledLabel = styled.label`
 
 function RemainingTokens(props) {
   const tokenSymbol = useSelector((state) => state.token.tokenSymbol);
-  const totalSupply = useSelector((state) => state.token.totalSupply);
+  const remainingTokens = useSelector((state) => state.token.remainingTokens);
   return (
-    <StyledLabel>REMAINING TOKENS: {totalSupply} {tokenSymbol}</StyledLabel>
+    <Typography variant="h5">
+      Remaining Tokens: {remainingTokens} {tokenSymbol}
+    </Typography>
   );
 }
 
@@ -56,9 +56,8 @@ export function LoyaltyCoinDistributionPage(props) {
     async function distributeLoyaltyTokens(signer) {
       try {
         console.log(`Starting to distribute ${tokenName} tokens`);
-        const amount = ethers.utils.parseEther(airdropAmount);
         const helper = new LoyaltyCoinHelper(signer);
-        helper.earnCoins(tokenSymbol, airdropAddress, amount);
+        helper.earnCoins(tokenSymbol, airdropAddress, airdropAmount);
 
       } catch (error) {
         window.alert(
@@ -72,28 +71,41 @@ export function LoyaltyCoinDistributionPage(props) {
   return (
     <>
       <ActivateDeactivate />
-      <SectionDivider />
-      <WalletStatus />
-      <SectionDivider />
-      <RemainingTokens />
-      <StyledInput
-        id="airdropAmount"
-        type="text"
-        placeholder={airdropAmount ? '' : 'Airdrop Amount'}
-        onChange={handleAirdropAmountChange}
-      ></StyledInput>
-      <StyledInput
-        id="airdropAddressInput"
-        type="text"
-        placeholder={airdropAddress ? '' : 'Airdrop Address'}
-        onChange={handleAirdropAddressChange}
-      ></StyledInput>
-      <StyledButton
-        id="createTokenButton"
-        onClick={handleDistributeTokens}
-      >
-        Distribute Tokens
-      </StyledButton>
+      <Divider />
+      <Container>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <RemainingTokens />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              id="airdropAddressInput"
+              label={airdropAddress ? '' : 'Airdrop Address'}
+              onChange={handleAirdropAddressChange}
+              style={{ width: 1000 }}
+            ></TextField>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              id="airdropAmount"
+              label={airdropAmount ? '' : 'Airdrop Amount'}
+              onChange={handleAirdropAmountChange}
+              style={{ width: 200 }}
+            ></TextField>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              variant="outlined"
+              id="distributeTokensButton"
+              onClick={handleDistributeTokens}
+              size="large"
+            >
+              Distribute Tokens
+            </Button>
+          </Grid>
+        </Grid>
+      </Container>
     </>
   );
 }
